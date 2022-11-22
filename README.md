@@ -100,14 +100,14 @@ docker build -t ruoyi-ui:v3.8 .
 docker images
 ```
 
-## Private registry
-We use registry to set up private registry, and tag our private registry address as the image's address
+## Private repository
+We use registry to set up private repository, and tag our private repository address as the image's address
 ```
 docker run -d -p 5000:5000 --restart always --name registry registry:2
 docker tag ruoyi-ui:v3.8 10.150.36.72:5000/ruoyi-ui:v3.8
 docker tag ruoyi-admin:v3.8 10.150.36.72:5000/ruoyi-admin:v3.8
 ```
-Then, push images to private registry
+Then, push images to private repository
 ```
 docker push 10.150.36.72:5000/ruoyi-ui:v3.8
 docker push 10.150.36.72:5000/ruoyi-admin:v3.8
