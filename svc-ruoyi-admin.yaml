@@ -15,6 +15,52 @@ spec:
       labels:
         app: ruoyi-admin
     spec:
+      initContainers:
+        - name: wait-for-mysql
+          image: bitnami/mysql:8.0.31-debian-11-r0
+          env: 
+            - name: MYSQL_ROOT_PASSWORD
+              value: "123456"
+          command: 
+            - sh
+            - -c 
+            - |
+            set -e 
+            maxtries=10
+            while ["$$maxTries" -gt 0] \
+                  && ! mysqladmin ping --connect-time=3 -s \
+                                  -hdb-mysql-primary -uroot -p$$MYSQL_ROOT_PASSWORD
+            do 
+                echo "Waiting for MYSQL to be available"
+                sleep 5
+                let maxTries--
+            done 
+            if ["$$maxTries" -le 0]; then 
+                echo >&2 "error: unable to contact MySQL after 10 tries"
+                exit 1
+            fi
+        - name: wait-for-redis
+          image: bitnami/redis:7.0.5-debian-11-r7
+          env: 
+            - name: REDIS_PASSWORD
+              value: "123456"
+          command: 
+            - sh
+            - -c 
+            - |
+            set -e 
+            maxtries=10
+            while ["$$maxTries" -gt 0] \
+                  && ! timeout 3 redis-cli -h redis-master -a $$REDIS_PASSWORD ping
+            do 
+                echo "Waiting for Redis to be available"
+                sleep 5
+                let maxTries--
+            done 
+            if ["$$maxTries" -le 0]; then 
+                echo >&2 "error: unable to contact Redis after 10 tries"
+                exit 1
+            fi
       containers:
       - name: ruoyi-admin
         image: 10.150.36.72:5000/ruoyi-admin:v3.8

@@ -15,6 +15,18 @@ spec:
       labels:
         app: ruoyi-ui
     spec:
+      initContainers: 
+        - name: wait-for-ruoyi-admin
+          image: nginx:1.22
+          command:
+            - sh
+            - -c 
+            - |
+              unitl curl -m 3 ruoyi-admin:8080 
+              do 
+                echo waiting for ruoyi-admin;
+                sleep 5;
+              done 
       containers:
       - name: ruoyi-ui
         image: 10.150.36.72:5000/ruoyi-ui:v3.8

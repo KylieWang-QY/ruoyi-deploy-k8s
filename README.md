@@ -140,3 +140,39 @@ kubectl get svc
 Here, let's access 30080 from browser. Both frontend and backend application deployed successfully!
 
 ## Pod starting sequence
+Once the application deployment is complete, let's restart the service. However, if ruoyi-admin starts before mysql or redis, the service will report an error and start failed.
+
+We can use Init Container to control starting sequence.
+- In Pod, the init container launches before the application container
+- The application container won't launch until the init container has finished running
+- Several init containers are executed in succession, and the following one won't run until the preceding one is finished
+
+In this project, frontend applicaiton `ruoyi-ui` must wait for the backend service to be ready before staring. Add initContainers parts into `svc-ruoyi-ui.yaml`.
+
+Delete  svc-ruoyi-admin.yaml and svc-ruoyi-ui.yaml created previously
+```
+kubectl delete -f svc-ruoyi-admin.yaml -f svc-ruoyi-ui.yaml
+```
+Re-create front-end service
+```
+kubectl apply -f svc-ruoyi-ui.yaml
+kubectl get pod
+```
+Re-create backend service
+```
+kubectl apply -f svc-ruoyi-admin.yaml
+kubectl get pod --watch
+```
+We can observe that the ruoyi-ui pod's state changes to "PodInitializing" only when the ruoyi-admin pod's status changes to "Running."
+
+However, using `until do` to wait for the dependant service to be ready is an option, but it is an endless loop. A better way is to set the number of failed retries. IF this threshold is surpassed, the init container exit wilth failure status, and pod start terminated.
+
+In this project, backend applicaiton `ruoyi-admin` must wait for MySQL and Redis to be ready before starting. 
+- See MySQL official example [Bonita](https://github.com/docker-library/docs/blob/master/bonita/stack.yml)
+- Add init Containers into svc-ruoyi-admin.yaml
+
+Delete and re-create svc-ruoyi-admin.yaml
+```
+kubectl delete -f svc-ruoyi-admin.yaml 
+kubectl apply -f svc-ruoyi-admin.yaml 
+```
