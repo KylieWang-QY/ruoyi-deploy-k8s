@@ -1,0 +1,13 @@
+# Compile
+FROM maven AS build
+WORKDIR /app/build
+# Copy the files in the current directory of the machine to the current directory of the container, that is /app/build/
+COPY . . 
+RUN mvn clean package
+
+# Package
+FROM openjdk:8u432-jre
+WORKDIR /app/ruoyi
+COPY --from=build /app/build/ruoyi-admin/target/ruoyi-admin.jar .
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","ruoyi-admin.jar"]

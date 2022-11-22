@@ -74,3 +74,28 @@ Test MySQL connection
 kubectl get pod
 kubectl port-forward pods/db-mysql-primary-0 --address=localhost:3306
 ```
+## Backend image
+Fix backend source code
+- `ruoyi-admin/src/resources/application.yml`, fix profile to `/home/ruoyi/uploadPath`
+- `ruoyi-admin/src/resources/application.yml`, fix redis's password to `123456`
+- `ruoyi-admin/src/resources/application-druid.yml`, fix mysql's password to `123456`
+
+Under project's /root, create project's Dockerfile and build image
+```
+docker build -t  ruoyi-admin:v3.8 .
+docker images
+```
+
+## Frontend image
+Frontend code is in the /ruoyi-ui, we compile frontend code in the container.
+```
+cd /app/ruoyi-ui
+npm install 
+npm install --registry=https://registry.npmmirror.com
+npm run build:prod
+```
+Create Dockerfile under /ruoyi-ui/src/, and build image
+```
+docker build -t ruoyi-ui:v3.8 .
+docker images
+
