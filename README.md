@@ -5,7 +5,7 @@ Ruoyi is a Java EE enterprise-level rapid deployment platform built on classic t
 - Document download: <https://doc.ruoyi.vip/ruoyi-vue>
 - Source code download: <https://gitee.com/y_project/RuoYi-Vue>
 - Deployment guideline: <https://doc.ruoyi.vip/ruoyi-vue/document/hjbs.html>
-Note that the documentation is only available in Chinese
+- Note that the documentation is only available in Chinese
 
 ## Preparation
 ```
@@ -105,16 +105,18 @@ We use registry to set up private registry, and tag our private registry address
 ```
 docker run -d -p 5000:5000 --restart always --name registry registry:2
 docker tag ruoyi-ui:v3.8 10.150.36.72:5000/ruoyi-ui:v3.8
+docker tag ruoyi-admin:v3.8 10.150.36.72:5000/ruoyi-admin:v3.8
 ```
-Then, push the image to private registry
+Then, push images to private registry
 ```
 docker push 10.150.36.72:5000/ruoyi-ui:v3.8
+docker push 10.150.36.72:5000/ruoyi-admin:v3.8
 ```
 
 ## Deploy backend application
 To introduce addresses in k8s, we create `applicaiton-k8s.yaml`, replace the redis host address and MySQL host address.
 ```
-kubectl create cm ruoyi-admin-config --from-file=/home/app/application-k8s.yaml
+kubectl create cm ruoyi-admin-config --from-file=/home/app/conf/application-k8s.yaml
 ```
 Then, we mount configMap to the container by volume, see `svc-ruoyi-admin.yaml`
 
@@ -123,3 +125,18 @@ Create the backend deployment and service
 kubectl apply -f svc-ruoyi-admin.yaml
 kubectl get pod
 ```
+## Deploy frontend application
+Reference official deployment guide, fix nginx.conf
+```
+kubectl create cm ruoyi-ui-config --from-file=/home/app.conf/nginx.conf
+```
+Then, we mount configMap to the container by volume, see `svc-ruoyi-ui.yaml`
+
+Create the backend deployment and service
+```
+kubectl apply -f svc-ruoyi-ui.yaml
+kubectl get svc
+```
+Here, let's access 30080 from browser. Both frontend and backend application deployed successfully!
+
+## Pod starting sequence

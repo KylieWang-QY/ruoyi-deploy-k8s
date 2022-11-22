@@ -24,7 +24,7 @@ spec:
       - mountPath: /app/ruoyi/config
         name: config 
       args: ["--spring.profiles.active=k8s"]
-      volume: 
+      volumes: 
         - name: config 
           configMap:
             name: ruoyi-admin-config
