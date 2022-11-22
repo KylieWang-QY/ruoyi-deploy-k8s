@@ -176,3 +176,10 @@ Delete and re-create svc-ruoyi-admin.yaml
 kubectl delete -f svc-ruoyi-admin.yaml 
 kubectl apply -f svc-ruoyi-admin.yaml 
 ```
+
+## Ingress
+To expose service to the public, we need to add Ingress to access frontend from external network.
+```
+kubectl apply -f ruoyi-ingress.yaml
+```
+If we want to access frontend applicaiton and backend applicaiton separately, we need to add host into ingress file. See `ruoyi-ingress2.yaml`
