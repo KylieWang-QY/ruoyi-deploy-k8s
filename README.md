@@ -98,4 +98,28 @@ Create Dockerfile under /ruoyi-ui/src/, and build image
 ```
 docker build -t ruoyi-ui:v3.8 .
 docker images
+```
 
+## Private registry
+We use registry to set up private registry, and tag our private registry address as the image's address
+```
+docker run -d -p 5000:5000 --restart always --name registry registry:2
+docker tag ruoyi-ui:v3.8 10.150.36.72:5000/ruoyi-ui:v3.8
+```
+Then, push the image to private registry
+```
+docker push 10.150.36.72:5000/ruoyi-ui:v3.8
+```
+
+## Deploy backend application
+To introduce addresses in k8s, we create `applicaiton-k8s.yaml`, replace the redis host address and MySQL host address.
+```
+kubectl create cm ruoyi-admin-config --from-file=/home/app/application-k8s.yaml
+```
+Then, we mount configMap to the container by volume, see `svc-ruoyi-admin.yaml`
+
+Create the backend deployment and service
+```
+kubectl apply -f svc-ruoyi-admin.yaml
+kubectl get pod
+```

@@ -1,0 +1,45 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ruoyi-admin
+  labels:
+    app: ruoyi-admin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ruoyi-admin
+  template:
+    metadata:
+      labels:
+        app: ruoyi-admin
+    spec:
+      containers:
+      - name: ruoyi-admin
+        image: 10.150.36.72:5000/ruoyi-admin:v3.8
+        ports:
+        - containerPort: 8080
+      volumeMounts:
+      - mountPath: /app/ruoyi/config
+        name: config 
+      args: ["--spring.profiles.active=k8s"]
+      volume: 
+        - name: config 
+          configMap:
+            name: ruoyi-admin-config
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: ruoyi-admin
+spec:
+  type: ClusterIP
+  selector:
+    app: ruoyi-admin
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
